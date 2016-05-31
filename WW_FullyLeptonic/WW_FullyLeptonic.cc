@@ -47,15 +47,15 @@ int main(int argc, char** argv) {
      * Load events from input file, retrieve reconstructed particles and MET
      */
     TChain chain("T");
-    chain.Add("../WW_FullyLeptonic/WW_20ev.root");
+    chain.Add("../WW_FullyLeptonic/new_HH_to_WW_DelphesCMS.root");
 
     TLorentzVector *lepton1 = nullptr;
     TLorentzVector *lepton2 = nullptr;
-    int charge_lep1=0;
+    //int charge_lep1=0;
 
     chain.SetBranchAddress("lepton1", &lepton1);
     chain.SetBranchAddress("lepton2", &lepton2);
-    chain.SetBranchAddress("charge_lep1", &charge_lep1);
+    //chain.SetBranchAddress("charge_lep1", &charge_lep1);
     int N = chain.GetEntries();
     
     /*
@@ -63,10 +63,10 @@ int main(int argc, char** argv) {
      * with the addition of the weights we're computing (including uncertainty and computation time)
      */
     TTree* out_tree = chain.CloneTree(0);
-    double weight_WW, weight_WW_err, weight_WW_time;
-    out_tree->Branch("weight_WW", &weight_WW);
-    out_tree->Branch("weight_WW_err", &weight_WW_err);
-    out_tree->Branch("weight_WW_time", &weight_WW_time);
+    double weight_H_to_WW, weight_H_to_WW_err, weight_H_to_WW_time;
+    out_tree->Branch("weight_H_to_WW", &weight_H_to_WW);
+    out_tree->Branch("weight_H_to_WW_err", &weight_H_to_WW_err);
+    out_tree->Branch("weight_H_to_WW_time", &weight_H_to_WW_time);
  
     /*
      * Prepare MoMEMta to compute the weights
@@ -88,10 +88,10 @@ int main(int argc, char** argv) {
         
         LorentzVector lep1_p4 { lepton1->Px(), lepton1->Py(), lepton1->Pz(), lepton1->E() };
         LorentzVector lep2_p4 { lepton2->Px(), lepton2->Py(), lepton2->Pz(), lepton2->E() };
-        int charge_l1 = charge_lep1;
+        //int charge_l1 = charge_lep1;
 
-        if (charge_l1 < 0)
-            std::swap(lep1_p4, lep2_p4);
+        //if (charge_l1 < 0)
+        //    std::swap(lep1_p4, lep2_p4);
 
         auto start_time = system_clock::now();
         // Compute the weights!
@@ -99,17 +99,17 @@ int main(int argc, char** argv) {
         auto end_time = system_clock::now();
 
         // Retrieve the weight and uncertainty
-        weight_WW = weights.back().first;
-        weight_WW_err = weights.back().second;
-        weight_WW_time = std::chrono::duration_cast<milliseconds>(end_time - start_time).count();
+        weight_H_to_WW = weights.back().first;
+        weight_H_to_WW_err = weights.back().second;
+        weight_H_to_WW_time = std::chrono::duration_cast<milliseconds>(end_time - start_time).count();
 
-        LOG(debug) << "Event " << entry << " result: " << weight_WW << " +- " << weight_WW_err;
-        LOG(info) << "Weight computed in " << weight_WW_time << "ms";
+        LOG(debug) << "Event " << entry << " result: " << weight_H_to_WW << " +- " << weight_H_to_WW_err;
+        LOG(info) << "Weight computed in " << weight_H_to_WW_time << "ms";
 
         out_tree->Fill();
     }
 
-    //Save our output TTree
+    Save our output TTree
     out_tree->SaveAs("WW_weighted.root");
 
     return 0;
