@@ -110,7 +110,7 @@ int main(int argc, char** argv) {
     }
 
     Save our output TTree
-    out_tree->SaveAs("WW_weighted.root");
+    out_tree->SaveAs("H_to_WW_weighted.root");
 
     return 0;
 }
